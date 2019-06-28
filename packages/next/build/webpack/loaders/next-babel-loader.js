@@ -22,8 +22,6 @@ const getModernOptions = (babelOptions = {}) => {
     'babel-plugin-transform-regenerator',
     'babel-plugin-transform-async-to-generator'
   ]
-  // presetEnvOptions.useBuiltIns = 'usage';
-  // transformRuntimeOptions.corejs = false;
 
   return {
     ...babelOptions,
