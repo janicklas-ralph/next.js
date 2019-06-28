@@ -131,7 +131,7 @@ module.exports = babelLoader.custom(babel => {
 
       if (isModern) {
         const nextPreset = options.presets.find(
-          preset => preset && preset.value && preset.value === nextBabelPreset
+          preset => preset && preset.value === nextBabelPreset
         ) || { options: {} }
 
         const additionalPresets = options.presets.filter(
