@@ -23,7 +23,7 @@
  */
 
 /**
- * A large part of the code was copied/referred from https://github.com/prateekbh/babel-esm-plugin
+ * Original source from which this was built upon - https://github.com/prateekbh/babel-esm-plugin
  */
 
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin')
