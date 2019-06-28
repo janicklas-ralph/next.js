@@ -576,7 +576,7 @@ export class NextScript extends Component<OriginProps> {
         }
         nonce={this.props.nonce}
         crossOrigin={this.props.crossOrigin || process.crossOrigin}
-        {...(process.env.__NEXT_MODERN_BUILD ? { nomodule: true } : {})}
+        {...(process.env.__NEXT_MODERN_BUILD ? { noModule: true } : {})}
       />,
       process.env.__NEXT_MODERN_BUILD && (
         <script
@@ -610,7 +610,7 @@ export class NextScript extends Component<OriginProps> {
         }
         nonce={this.props.nonce}
         crossOrigin={this.props.crossOrigin || process.crossOrigin}
-        {...(process.env.__NEXT_MODERN_BUILD ? { nomodule: true } : {})}
+        {...(process.env.__NEXT_MODERN_BUILD ? { noModule: true } : {})}
       />,
       process.env.__NEXT_MODERN_BUILD && (
         <script
