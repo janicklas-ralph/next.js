@@ -104,6 +104,7 @@
     "webpack-dev-middleware": "3.7.0",
     "webpack-hot-middleware": "2.25.0",
     "webpack-sources": "1.3.0",
+    "whatwg-fetch": "^3.0.0",
     "worker-farm": "1.7.0"
   },
   "peerDependencies": {

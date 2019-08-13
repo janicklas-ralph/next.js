@@ -153,11 +153,24 @@ export default async function getBaseWebpackConfig(
       ...(config.experimental.modernOptimizations &&
         (!isServer
           ? {
-              url$: path.join(NEXT_PROJECT_ROOT_DIST_CLIENT, 'url.js'),
-              querystring$: 'qss',
-              'querystring-es3$': 'qss',
+              url: path.join(NEXT_PROJECT_ROOT_DIST_CLIENT, 'url.js'),
+              querystring: 'qss',
+              'querystring-es3': 'qss',
+
+              unfetch: path.join(__dirname, 'polyfills', 'fetch.js'),
+              'isomorphic-unfetch': path.join(
+                __dirname,
+                'polyfills',
+                'fetch.js'
+              ),
+              'whatwg-fetch': path.join(__dirname, 'polyfills', 'fetch.js'),
+              'object-assign': path.join(
+                __dirname,
+                'polyfills',
+                'object-assign.js'
+              ),
             }
-          : { 'querystring-es3$': 'querystring' })),
+          : { 'querystring-es3': 'querystring' })),
     },
     mainFields: isServer ? ['main', 'module'] : ['browser', 'module', 'main'],
   }
@@ -497,6 +510,11 @@ export default async function getBaseWebpackConfig(
         'process.env.__NEXT_MODERN_BUILD': config.experimental.modern && !dev,
         'process.env.__NEXT_MODERN_OPTIMIZATIONS': !!config.experimental
           .modernOptimizations,
+        ...(config.experimental.modernOptimizations
+          ? {
+              'typeof URL': '"function"',
+            }
+          : {}),
         ...(isServer
           ? {
               // Allow browser-only code to be eliminated
