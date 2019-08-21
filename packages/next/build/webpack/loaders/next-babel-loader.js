@@ -4,38 +4,9 @@ import babelLoader from 'babel-loader'
 
 // increment 'd' to invalidate cache
 const cacheKey = 'babel-cache-' + 'd' + '-'
-const nextBabelPreset = require('../../babel/preset')
-
-const getModernOptions = (babelOptions = {}) => {
-  const presetEnvOptions = Object.assign({}, babelOptions['preset-env'])
-  const transformRuntimeOptions = Object.assign(
-    {},
-    babelOptions['transform-runtime'],
-    { regenerator: false }
-  )
-
-  presetEnvOptions.targets = {
-    esmodules: true
-  }
-  presetEnvOptions.exclude = [
-    ...(presetEnvOptions.exclude || []),
-    // Blacklist accidental inclusions
-    'transform-regenerator',
-    'transform-async-to-generator'
-  ]
-
-  return {
-    ...babelOptions,
-    'preset-env': presetEnvOptions,
-    'transform-runtime': transformRuntimeOptions
-  }
-}
-
-const nextBabelPresetModern = presetOptions => context =>
-  nextBabelPreset(context, getModernOptions(presetOptions))
 
 module.exports = babelLoader.custom(babel => {
-  const presetItem = babel.createConfigItem(nextBabelPreset, {
+  const presetItem = babel.createConfigItem(require('../../babel/preset'), {
     type: 'preset'
   })
   const applyCommonJs = babel.createConfigItem(
@@ -115,6 +86,7 @@ module.exports = babelLoader.custom(babel => {
       }
 
       options.caller.isServer = isServer
+      options.caller.isModern = isModern
 
       if (!isServer && isPageFile) {
         const pageConfigPlugin = babel.createConfigItem(
@@ -135,25 +107,6 @@ module.exports = babelLoader.custom(babel => {
         )
         options.plugins = options.plugins || []
         options.plugins.push(nextDataPlugin)
-      }
-
-      if (isModern) {
-        const nextPreset = options.presets.find(
-          preset => preset && preset.value === nextBabelPreset
-        ) || { options: {} }
-
-        const additionalPresets = options.presets.filter(
-          preset => preset !== nextPreset
-        )
-
-        const presetItemModern = babel.createConfigItem(
-          nextBabelPresetModern(nextPreset.options),
-          {
-            type: 'preset'
-          }
-        )
-
-        options.presets = [...additionalPresets, presetItemModern]
       }
 
       // If the file has `module.exports` we have to transpile commonjs because Babel adds `import` statements

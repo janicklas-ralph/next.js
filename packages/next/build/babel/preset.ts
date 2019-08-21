@@ -36,6 +36,32 @@ function styledJsxOptions(options: StyledJsxBabelOptions) {
   return options
 }
 
+function getModernOptions(babelOptions: NextBabelPresetOptions) {
+  const presetEnvOptions = Object.assign({}, babelOptions['preset-env'])
+  const transformRuntimeOptions = Object.assign(
+    {},
+    babelOptions['transform-runtime'],
+    { regenerator: false }
+  )
+
+  presetEnvOptions.targets = {
+    esmodules: true,
+  }
+  presetEnvOptions.exclude = [
+    ...(presetEnvOptions.exclude || []),
+    // Blacklist accidental inclusions
+    'transform-typeof-symbol',
+    'transform-regenerator',
+    'transform-async-to-generator',
+  ]
+
+  return {
+    ...babelOptions,
+    'preset-env': presetEnvOptions,
+    'transform-runtime': transformRuntimeOptions,
+  }
+}
+
 type NextBabelPresetOptions = {
   'preset-env'?: any
   'preset-react'?: any
@@ -62,6 +88,12 @@ module.exports = (
 ): BabelPreset => {
   const supportsESM = api.caller(supportsStaticESM)
   const isServer = api.caller((caller: any) => !!caller && caller.isServer)
+  const isModern = api.caller((caller: any) => !!caller && caller.isModern)
+
+  if (isModern) {
+    options = getModernOptions(options)
+  }
+
   const presetEnvConfig = {
     // In the test environment `modules` is often needed to be set to true, babel figures that out by itself using the `'auto'` option
     // In production/development this option is set to `false` so that webpack can handle import/export with tree-shaking

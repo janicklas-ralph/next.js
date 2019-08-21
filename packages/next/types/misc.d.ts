@@ -88,3 +88,19 @@ declare module NodeJS {
     crossOrigin?: string
   }
 }
+
+declare module '@babel/preset-env/lib/targets-parser' {
+  function getTargets(
+    targets:
+      | {
+          browsers: string | string[]
+        }
+      | {
+          [x: string]: string
+        }
+  ): {
+    [key: string]: string
+  }
+
+  export = getTargets
+}

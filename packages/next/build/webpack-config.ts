@@ -35,6 +35,7 @@ import { ReactLoadablePlugin } from './webpack/plugins/react-loadable-plugin'
 import { ServerlessPlugin } from './webpack/plugins/serverless-plugin'
 import { SharedRuntimePlugin } from './webpack/plugins/shared-runtime-plugin'
 import { TerserPlugin } from './webpack/plugins/terser-webpack-plugin/src/index'
+import { shouldEnableModernBuild } from './target-parser'
 
 type ExcludesFalse = <T>(x: T | false) => x is T
 
@@ -322,10 +323,11 @@ export default async function getBaseWebpackConfig(
       : splitChunksConfigs.prod
   }
 
+  const enableModernBuild =
+    config.experimental.modern && !dev && shouldEnableModernBuild(dir)
+
   const crossOrigin =
-    !config.crossOrigin && config.experimental.modern
-      ? 'anonymous'
-      : config.crossOrigin
+    !config.crossOrigin && enableModernBuild ? 'anonymous' : config.crossOrigin
 
   let webpackConfig: webpack.Configuration = {
     devtool,
@@ -575,7 +577,7 @@ export default async function getBaseWebpackConfig(
         'process.env.__NEXT_EXPORT_TRAILING_SLASH': JSON.stringify(
           config.exportTrailingSlash
         ),
-        'process.env.__NEXT_MODERN_BUILD': config.experimental.modern && !dev,
+        'process.env.__NEXT_MODERN_BUILD': !!enableModernBuild,
         'process.env.__NEXT_MODERN_OPTIMIZATIONS': !!config.experimental
           .modernOptimizations,
         'process.env.__NEXT_GRANULAR_CHUNKS':
@@ -679,7 +681,7 @@ export default async function getBaseWebpackConfig(
         new BuildManifestPlugin({
           buildId,
           clientManifest: config.experimental.granularChunks,
-          modern: config.experimental.modern,
+          modern: enableModernBuild,
         }),
       config.experimental.profiling &&
         new webpack.debug.ProfilingPlugin({
@@ -701,9 +703,8 @@ export default async function getBaseWebpackConfig(
           silent: true,
           formatter: 'codeframe',
         }),
-      config.experimental.modern &&
+      enableModernBuild &&
         !isServer &&
-        !dev &&
         new NextEsmPlugin({
           filename: (getFileName: Function | string) => (...args: any[]) => {
             const name =
